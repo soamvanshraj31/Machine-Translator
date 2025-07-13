@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next-Gen Translator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4285f4;
+            --primary-dark: #357ae8;
+            --background: #f5f5f5;
+            --container-bg: #fff;
+            --text: #222;
+            --border: #ccc;
+            --shadow: 0 4px 16px rgba(0,0,0,0.12);
+            --accent: #ff9800;
+        }
+        [data-theme="dark"] {
+            --background: #181a1b;
+            --container-bg: #23272a;
+            --text: #f5f5f5;
+            --border: #444;
+            --shadow: 0 4px 16px rgba(0,0,0,0.5);
+        }
+        html, body {
+            height: 100%;
+        }
+        body {
+            min-height: 100vh;
+            background: var(--background);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Roboto', Arial, sans-serif;
+            transition: background 0.3s;
+        }
+        .container {
+            width: 95%;
+            max-width: 650px;
+            background: var(--container-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 32px 24px 24px 24px;
+            text-align: center;
+            transition: background 0.3s;
+        }
+        .branding {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .branding img {
+            width: 40px;
+            height: 40px;
+        }
+        h1 {
+            color: var(--primary);
+            font-size: 2.1rem;
+            margin-bottom: 6px;
+        }
+        .tagline {
+            font-size: 1.1rem;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+        .translator-box {
+            margin-top: 10px;
+        }
+        .lang-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .lang-select {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 1rem;
+            background: var(--background);
+            color: var(--text);
+        }
+        .swap-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .swap-btn:active {
+            transform: rotate(180deg);
+        }
+        .swap-btn img {
+            width: 28px;
+            height: 28px;
+        }
+        .text-box {
+            margin-bottom: 18px;
+            position: relative;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--text);
+            text-align: left;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            resize: none;
+            font-size: 15px;
+            background: var(--background);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+        textarea[readonly] {
+            background-color: #f0f0f0;
+        }
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .icon-btn:focus {
+            outline: 2px solid var(--primary);
+        }
+        .icon-btn img {
+            width: 22px;
+            height: 22px;
+        }
+        .main-btn {
+            padding: 10px 24px;
+            font-size: 17px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: #fff;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(66,133,244,0.08);
+            transition: background 0.2s;
+        }
+        .main-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .main-btn:hover:not(:disabled) {
+            background: linear-gradient(90deg, var(--primary-dark), var(--accent));
+        }
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0 18px 0;
+        }
+        .toggle-label {
+            font-size: 0.98rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            border-radius: 24px;
+            transition: .4s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: .4s;
+        }
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .spinner {
+            display: none;
+            margin: 0 auto 10px auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .note {
+            margin-top: 12px;
+            font-size: 13px;
+            color: #888;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 16px 4px 12px 4px;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" role="main">
+        <div class="branding">
+            <img src="https://img.icons8.com/color/48/000000/translate.png" alt="Translator Logo" aria-hidden="true">
+            <h1>Next-Gen Translator</h1>
+        </div>
+        <div class="tagline">Fast, Accurate, and Effortless Language Translation</div>
+        <div class="translator-box">
+            <div class="lang-row">
+                <select id="from-lang" class="lang-select" aria-label="Source language">
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="fr">French</option>
+                </select>
+                <button class="swap-btn" id="swap-btn" aria-label="Swap languages" title="Swap languages">
+                    <img src="https://img.icons8.com/ios-filled/50/sort-right.png" alt="Swap">
+                </button>
+                <select id="to-lang" class="lang-select" aria-label="Target language">
+                    <option value="hi">Hindi</option>
+                    <option value="en">English</option>
+                    <option value="fr">French</option>
+                </select>
+            </div>
+            <div class="toggle-row">
+                <label class="toggle-label" for="live-toggle">
+                    <input type="checkbox" id="live-toggle" style="margin-right:6px;"> Live Translation
+                </label>
+                <label class="toggle-label" for="theme-toggle">
+                    <span>Dark Mode</span>
+                    <span class="toggle-switch">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="slider"></span>
+                    </span>
+                </label>
+            </div>
+            <div class="spinner" id="spinner" aria-live="polite" aria-busy="true"></div>
+            <div class="text-box">
+                <label for="input-text">Input</label>
+                <textarea id="input-text" placeholder="Type or speak here..." aria-label="Input text"></textarea>
+                <div class="btn-row">
+                    <button class="icon-btn" id="mic-btn" aria-label="Voice input" title="Voice input">
+                        <img src="https://img.icons8.com/ios-filled/50/microphone.png" alt="Mic">
+                    </button>
+                    <button class="icon-btn" id="copy-input-btn" aria-label="Copy input" title="Copy input">
+                        <img src="https://img.icons8.com/ios-filled/50/copy.png" alt="Copy">
+                    </button>
+                    <button class="icon-btn" id="clear-input-btn" aria-label="Clear input" title="Clear input">
+                        <img src="https://img.icons8.com/ios-filled/50/erase.png" alt="Clear">
+                    </button>
+                </div>
+            </div>
+            <button class="main-btn" id="translate-button">Translate</button>
+            <div class="text-box">
+                <label for="output-text">Output</label>
+                <textarea id="output-text" readonly aria-label="Output text"></textarea>
+                <div class="btn-row">
+                    <button class="icon-btn" id="speaker-btn" aria-label="Listen output" title="Listen output">
+                        <img src="https://img.icons8.com/ios-filled/50/speaker.png" alt="Speaker">
+                    </button>
+                    <button class="icon-btn" id="copy-output-btn" aria-label="Copy output" title="Copy output">
+                        <img src="https://img.icons8.com/ios-filled/50/copy.png" alt="Copy">
+                    </button>
+                    <button class="icon-btn" id="clear-output-btn" aria-label="Clear output" title="Clear output">
+                        <img src="https://img.icons8.com/ios-filled/50/erase.png" alt="Clear">
+                    </button>
+                </div>
+            </div>
+        </div>
+        <p class="note">Powered by Helsinki-NLP &middot; <span id="accessibility-note">Accessible & Keyboard Friendly</span></p>
+    </div>
+    <script>
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('change', () => {
+            document.documentElement.setAttribute('data-theme', themeToggle.checked ? 'dark' : 'light');
+        });
+        // Language swap
+        const fromLang = document.getElementById('from-lang');
+        const toLang = document.getElementById('to-lang');
+        document.getElementById('swap-btn').addEventListener('click', () => {
+            const temp = fromLang.value;
+            fromLang.value = toLang.value;
+            toLang.value = temp;
+            // Optionally swap text too
+            const input = document.getElementById('input-text');
+            const output = document.getElementById('output-text');
+            const tempText = input.value;
+            input.value = output.value;
+            output.value = tempText;
+        });
+        // Copy/Clear buttons
+        document.getElementById('copy-input-btn').addEventListener('click', () => {
+            navigator.clipboard.writeText(document.getElementById('input-text').value);
+        });
+        document.getElementById('clear-input-btn').addEventListener('click', () => {
+            document.getElementById('input-text').value = '';
+        });
+        document.getElementById('copy-output-btn').addEventListener('click', () => {
+            navigator.clipboard.writeText(document.getElementById('output-text').value);
+        });
+        document.getElementById('clear-output-btn').addEventListener('click', () => {
+            document.getElementById('output-text').value = '';
+        });
+        // Spinner
+        function showSpinner(show) {
+            document.getElementById('spinner').style.display = show ? 'block' : 'none';
+        }
+        // Translate function
+        async function translateText() {
+            const input = document.getElementById('input-text').value;
+            const from = fromLang.value;
+            const to = toLang.value;
+            if (!input.trim()) {
+                alert('Please enter some text to translate.');
+                return;
+            }
+            showSpinner(true);
+            document.getElementById('translate-button').disabled = true;
+            try {
+                const response = await fetch('/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        english_text: input, // For now, keep the backend param as is
+                        from_lang: from,
+                        to_lang: to
+                    })
+                });
+                const data = await response.json();
+                if (data.error) {
+                    document.getElementById('output-text').value = `Error: ${data.error}`;
+                } else {
+                    document.getElementById('output-text').value = data.translation || data.hindi_translation || '';
+                }
+            } catch (error) {
+                document.getElementById('output-text').value = 'An error occurred while fetching the translation.';
+            }
+            showSpinner(false);
+            document.getElementById('translate-button').disabled = false;
+        }
+        document.getElementById('translate-button').addEventListener('click', translateText);
+        // Live translation
+        const liveToggle = document.getElementById('live-toggle');
+        document.getElementById('input-text').addEventListener('input', () => {
+            if (liveToggle.checked) {
+                translateText();
+            }
+        });
+        // Voice input
+        const micBtn = document.getElementById('mic-btn');
+        let recognition;
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            micBtn.addEventListener('click', () => {
+                recognition.lang = fromLang.value === 'hi' ? 'hi-IN' : 'en-US';
+                recognition.start();
+            });
+            recognition.onresult = (event) => {
+                document.getElementById('input-text').value = event.results[0][0].transcript;
+                if (liveToggle.checked) translateText();
+            };
+        } else {
+            micBtn.disabled = true;
+            micBtn.title = 'Voice input not supported';
+        }
+        // Voice output
+        document.getElementById('speaker-btn').addEventListener('click', () => {
+            const text = document.getElementById('output-text').value;
+            const lang = toLang.value === 'hi' ? 'hi-IN' : 'en-US';
+            if ('speechSynthesis' in window) {
+                const utter = new SpeechSynthesisUtterance(text);
+                utter.lang = lang;
+                window.speechSynthesis.speak(utter);
+            }
+        });
+        // Accessibility: keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') translateText();
+            if (e.altKey && e.key === 'l') liveToggle.checked = !liveToggle.checked;
+            if (e.altKey && e.key === 'd') themeToggle.checked = !themeToggle.checked;
+        });
+        // Accessibility: focus
+        const focusable = 'button, [tabindex]:not([tabindex="-1"]), select, textarea';
+        document.querySelectorAll(focusable).forEach(el => {
+            el.setAttribute('tabindex', '0');
+        });
+        // Set initial theme
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            themeToggle.checked = true;
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</body>
+</html>
